@@ -27,12 +27,19 @@ function saveEntry() {
 function renderEntries() {
   const entries = JSON.parse(localStorage.getItem('my_diary_v1') || '[]');
   const list = document.getElementById('diary-list');
-  list.innerHTML = entries.map(e => `
+  list.innerHTML = entries.map(e => {
+    const dateEl = document.createElement('small');
+    dateEl.textContent = e.date;
+    const contentEl = document.createElement('div');
+    contentEl.textContent = e.content;
+    contentEl.style.whiteSpace = 'pre-wrap';
+    return `
     <div class="entry">
-      <small>${e.date}</small>
-      <div>${e.content.replace(/\n/g, '<br>')}</div>
+      ${dateEl.outerHTML}
+      ${contentEl.outerHTML}
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // 실행 시 목록 로드
