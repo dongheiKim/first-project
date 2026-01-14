@@ -3,22 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minimal Diary 2025</title>
-  <!-- PWA 설정 및 CSS 연결 -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+  <title>Minimal Diary 2026</title>
 </head>
 <body>
-  <div class="container">
-    <h1>📝 2025 Diary</h1>
-    <textarea id="content" placeholder="오늘 어떤 일이 있었나요?"></textarea>
-    <button onclick="saveEntry()">기록하기</button>
-    
-    <div id="diary-list">
-      <!-- 자바스크립트로 일기가 여기에 추가됩니다 -->
-    </div>
-  </div>
-  
-  <script src="main.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
