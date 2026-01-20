@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navigation } from './components/Navigation';
 import { useTranslation } from './locales';
+import { ROUTES } from './utils/constants';
 import './style.css';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -10,59 +11,52 @@ const WritePage = lazy(() => import('./pages/WritePage'));
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
-function LoadingFallback() {
-  return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '400px',
-      fontSize: '1.5rem',
-    }}>
-      ⏳ 로딩 중...
-    </div>
-  );
-}
+const LoadingFallback = () => (
+  <div className="loading-container">
+    <p>⏳ 로딩 중...</p>
+  </div>
+);
 
-function AppContent() {
+const AppContent = () => {
   const { isDarkMode, toggleDarkMode } = useApp();
   const t = useTranslation();
 
   return (
     <div className="container">
-      <div className="header">
+      <header className="header">
         <h1>{t.appTitle}</h1>
         <button 
           className="theme-toggle-btn" 
           onClick={toggleDarkMode} 
           title={isDarkMode ? t.lightMode : t.darkMode}
+          aria-label={isDarkMode ? t.lightMode : t.darkMode}
         >
           {isDarkMode ? '☀️' : '🌙'}
         </button>
-      </div>
+      </header>
 
       <Navigation />
 
-      <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/write" element={<WritePage />} />
-          <Route path="/stats" element={<StatsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </Suspense>
+      <main>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path={ROUTES.HOME} element={<HomePage />} />
+            <Route path={ROUTES.WRITE} element={<WritePage />} />
+            <Route path={ROUTES.STATS} element={<StatsPage />} />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+          </Routes>
+        </Suspense>
+      </main>
     </div>
   );
-}
+};
 
-function App() {
-  return (
-    <AppProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AppProvider>
-  );
-}
+const App = () => (
+  <AppProvider>
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  </AppProvider>
+);
 
 export default App;

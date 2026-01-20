@@ -1,44 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { compressData, decompressData } from '../utils/compression';
 
 /**
  * localStorage를 React 상태로 관리하는 커스텀 훅
- * @param {string} key - localStorage 키
- * @param {any} initialValue - 초기값
- * @returns {[any, Function]} - [값, 설정함수]
  */
 export function useLocalStorage(key, initialValue) {
-  const readValue = () => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
+  const [storedValue, setStoredValue] = useState(() => {
+    if (typeof window === 'undefined') return initialValue;
 
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (!item) return initialValue;
+      
+      const parsed = JSON.parse(item);
+      
+      // 압축 데이터 확인 및 복원
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].i) {
+        return decompressData(parsed);
+      }
+      
+      return parsed;
     } catch (error) {
       console.warn(`localStorage 읽기 오류 (${key}):`, error);
       return initialValue;
     }
-  };
+  });
 
-  const [storedValue, setStoredValue] = useState(readValue);
-
-  const setValue = (value) => {
+  const setValue = useCallback((value) => {
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        const compressed = Array.isArray(valueToStore) 
+          ? compressData(valueToStore)
+          : valueToStore;
+        
+        window.localStorage.setItem(key, JSON.stringify(compressed));
       }
     } catch (error) {
       console.warn(`localStorage 쓰기 오류 (${key}):`, error);
     }
-  };
-
-  useEffect(() => {
-    setStoredValue(readValue());
-  }, [key]);
+  }, [key, storedValue]);
 
   return [storedValue, setValue];
 }
