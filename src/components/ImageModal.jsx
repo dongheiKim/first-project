@@ -3,8 +3,6 @@ import '../style.css';
 
 /**
  * 이미지 확대 모달
- * @param {string} imageUrl - 표시할 이미지 URL
- * @param {Function} onClose - 모달 닫기 콜백
  */
 export function ImageModal({ imageUrl, onClose }) {
   useEffect(() => {

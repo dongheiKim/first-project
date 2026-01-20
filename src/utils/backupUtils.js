@@ -1,6 +1,5 @@
 /**
  * 백업 관련 유틸리티 함수
- * 로컬 및 클라우드 백업/복원 로직 분리
  */
 
 import { compressData, decompressData } from './compression';
@@ -31,13 +30,7 @@ export function exportLocalData(entries, t) {
   
   // 메모리 정리
   URL.revokeObjectURL(url);
-  
-  // 압축 결과 표시
-  const originalSize = JSON.stringify(entries).length;
-  const compressedSize = dataStr.length;
-  const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-  
-  alert(`${t.exportSuccess}\n원본: ${(originalSize / 1024).toFixed(1)} KB\n압축: ${(compressedSize / 1024).toFixed(1)} KB\n감소율: ${reduction}%`);
+  alert(t.exportSuccess);
 }
 
 /**
