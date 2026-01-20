@@ -1,8 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
+import { measurePageLoad, checkMemoryUsage } from './utils/performance';
 
-// React 애플리케이션 초기화 및 마운트
+// 성능 모니터링
+if (process.env.NODE_ENV === 'development') {
+  window.addEventListener('load', () => {
+    measurePageLoad();
+    checkMemoryUsage();
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />

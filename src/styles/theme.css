@@ -1,0 +1,106 @@
+/* 다크모드 변수 */
+html.dark-mode {
+  --primary: #818cf8;
+  --primary-dark: #6366f1;
+  --primary-light: #a5b4fc;
+  --danger: #f87171;
+  --success: #34d399;
+  --border: #334155;
+  --bg-light: #1e293b;
+  --text-dark: #f1f5f9;
+  --text-light: #cbd5e1;
+}
+
+/* 다크모드 배경 */
+html.dark-mode body {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+/* 다크모드 컨테이너 */
+html.dark-mode .container {
+  background: #0f172a;
+  color: var(--text-dark);
+}
+
+/* 다크모드 입력 필드 */
+html.dark-mode textarea {
+  background: #1e293b;
+  color: var(--text-dark);
+  border-color: var(--border);
+}
+
+html.dark-mode .date-picker {
+  background: #1e293b;
+  color: var(--text-dark);
+  border-color: var(--border);
+}
+
+html.dark-mode .edit-textarea {
+  background: #1e293b;
+  color: var(--text-dark);
+}
+
+/* 다크모드 버튼 */
+html.dark-mode .filter-buttons button:hover {
+  background: #1e293b;
+}
+
+html.dark-mode .lang-btn {
+  background: #1e293b;
+  color: var(--text-dark);
+}
+
+html.dark-mode .lang-btn:hover {
+  background: #334155;
+}
+
+/* 다크모드 일기 */
+html.dark-mode .entry {
+  background: #1e293b;
+}
+
+/* 다크모드 모달 */
+html.dark-mode .modal-content {
+  background: #0f172a;
+  color: var(--text-dark);
+}
+
+/* 다크모드 백업 섹션 */
+html.dark-mode .backup-section {
+  background: #1e293b;
+  border-color: var(--border);
+}
+
+html.dark-mode .backup-section h3 {
+  color: var(--text-dark);
+}
+
+/* 다크모드 네비게이션 */
+html.dark-mode .navigation {
+  background: #1e293b;
+}
+
+html.dark-mode .nav-link {
+  color: var(--text-dark);
+}
+
+html.dark-mode .nav-link:hover {
+  background: #334155;
+}
+
+html.dark-mode .nav-link.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* 다크모드 통계 */
+html.dark-mode .stat-card {
+  background: #1e293b;
+  border-color: var(--border);
+}
+
+/* 다크모드 설정 */
+html.dark-mode .settings-page h2,
+html.dark-mode .settings-section h3 {
+  color: var(--text-dark);
+}

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useTranslation } from '../translations';
+import React, { useState, useCallback } from 'react';
+import { useTranslation } from '../locales';
 import '../style.css';
 
 /**
@@ -9,33 +9,33 @@ import '../style.css';
  * @param {Function} onUpdate - 일기 수정 시 호출되는 콜백
  * @param {Function} onDelete - 일기 삭제 시 호출되는 콜백
  */
-export function DiaryEntry({ entry, onUpdate, onDelete }) {
+function DiaryEntryComponent({ entry, onUpdate, onDelete }) {
   const t = useTranslation();
   const [isEditing, setIsEditing] = useState(false); // 편집 모드 상태
   const [editContent, setEditContent] = useState(entry.content); // 편집 중인 내용
 
   // 수정 내용 저장
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!editContent.trim()) {
       alert(t.contentRequired);
       return;
     }
     onUpdate(entry.id, editContent);
     setIsEditing(false);
-  };
+  }, [editContent, entry.id, onUpdate, t]);
 
   // 수정 취소 (원본 내용으로 복원)
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setEditContent(entry.content);
     setIsEditing(false);
-  };
+  }, [entry.content]);
 
   // 일기 삭제 (확인 후 실행)
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (window.confirm(t.deleteConfirm)) {
       onDelete(entry.id);
     }
-  };
+  }, [entry.id, onDelete, t]);
 
   return (
     <div className="entry">
@@ -66,3 +66,6 @@ export function DiaryEntry({ entry, onUpdate, onDelete }) {
     </div>
   );
 }
+
+// React.memo로 감싸기
+export const DiaryEntry = React.memo(DiaryEntryComponent);

@@ -1,0 +1,120 @@
+/* 모바일 최적화 */
+@media (max-width: 600px) {
+  .container {
+    min-height: 100vh;
+    padding: 12px;
+    box-shadow: none;
+  }
+
+  .filter-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .filter-buttons button {
+    flex: 1 1 45%;
+    min-width: 80px;
+    padding: 12px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .date-picker {
+    flex: 1 1 100%;
+    width: 100%;
+    font-size: 1rem;
+    padding: 14px 12px;
+  }
+  
+  .language-selector {
+    gap: 6px;
+  }
+  
+  .lang-btn {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    flex: 0 1 auto;
+  }
+
+  textarea {
+    font-size: 16px;
+    min-height: 100px;
+  }
+
+  .entry {
+    padding: 12px;
+  }
+
+  .button-group {
+    gap: 6px;
+  }
+
+  .btn-edit, .btn-delete, .btn-save, .btn-cancel {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  /* 네비게이션 모바일 최적화 */
+  .navigation {
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  /* 통계 페이지 모바일 */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-emoji {
+    font-size: 2rem;
+  }
+
+  .stat-card h3 {
+    font-size: 2rem;
+  }
+
+  /* 설정 페이지 모바일 */
+  .settings-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    padding: 16px;
+    font-size: 1.05rem;
+    min-height: 44px;
+  }
+  
+  .date-picker {
+    padding: 16px;
+    font-size: 1rem;
+    min-height: 44px;
+  }
+  
+  textarea {
+    font-size: 1.05rem;
+    padding: 18px;
+    min-height: 120px;
+  }
+
+  .filter-buttons button {
+    padding: 14px 12px;
+    min-height: 44px;
+  }
+
+  .lang-btn {
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /.env
+Disallow: /.git
+
+Sitemap: https://yourdomain.com/sitemap.xml

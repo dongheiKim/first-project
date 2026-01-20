@@ -1,43 +1,54 @@
-import { useState } from 'react';
-import { useTranslation } from '../translations';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from '../locales';
 import '../style.css';
 
 /**
- * 일기 입력 컴포넌트
- * 사용자가 새로운 일기를 작성할 수 있는 텍스트 입력 영역
- * @param {Function} onSave - 저장 버튼 클릭 시 호출되는 콜백 함수
+ * 일기 입력 폼 컴포넌트
+ * @param {Function} onSave - 저장 버튼 클릭 시 호출되는 콜백
+ * @param {boolean} shouldClear - 입력 필드를 초기화할지 여부
+ * @param {Function} onCleared - 필드 초기화 완료 후 호출되는 콜백
+ * @param {string} pendingContent - 저장 대기 중인 내용
  */
-export function DiaryInput({ onSave }) {
+export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
   const t = useTranslation();
-  const [content, setContent] = useState('');
+  const textareaRef = useRef(null);
 
-  // 저장 버튼 클릭 핸들러
-  const handleSave = () => {
-    if (!content.trim()) {
+  useEffect(() => {
+    if (shouldClear && textareaRef.current) {
+      textareaRef.current.value = '';
+      onCleared();
+    }
+  }, [shouldClear, onCleared]);
+
+  const handleKeyDown = (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      const content = textareaRef.current.value.trim();
+      if (!content) {
+        alert(t.contentRequired);
+        return;
+      }
+      onSave(content);
+    }
+  };
+
+  const handleSaveClick = () => {
+    const content = textareaRef.current.value.trim();
+    if (!content) {
       alert(t.contentRequired);
       return;
     }
     onSave(content);
-    setContent(''); // 저장 후 입력창 초기화
-  };
-
-  // 키보드 단축키 핸들러 (Ctrl + Enter)
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === 'Enter') {
-      handleSave();
-    }
   };
 
   return (
     <div className="input-section">
       <textarea
-        id="content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={handleKeyPress}
+        ref={textareaRef}
         placeholder={t.inputPlaceholder}
+        onKeyDown={handleKeyDown}
+        defaultValue={pendingContent}
       />
-      <button onClick={handleSave}>{t.saveButton}</button>
+      <button onClick={handleSaveClick}>{t.saveButton}</button>
     </div>
   );
 }
