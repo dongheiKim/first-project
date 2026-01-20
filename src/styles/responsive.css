@@ -86,6 +86,28 @@
     margin-bottom: 24px;
     padding-bottom: 20px;
   }
+
+  /* 이미지 미리보기 모바일 */
+  .image-preview-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .entry-images {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .input-actions {
+    flex-direction: column;
+  }
+
+  .btn-save,
+  .btn-add-image {
+    flex: 1;
+    width: 100%;
+  }
 }
 
 /* 터치 디바이스 최적화 */

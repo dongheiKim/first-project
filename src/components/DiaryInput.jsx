@@ -1,54 +1,167 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../locales';
+import { processBatchImages, getBase64Size } from '../utils/imageUtils';
 import '../style.css';
 
 /**
- * 일기 입력 폼 컴포넌트
- * @param {Function} onSave - 저장 버튼 클릭 시 호출되는 콜백
- * @param {boolean} shouldClear - 입력 필드를 초기화할지 여부
- * @param {Function} onCleared - 필드 초기화 완료 후 호출되는 콜백
- * @param {string} pendingContent - 저장 대기 중인 내용
+ * 일기 입력 폼 컴포넌트 (이미지 첨부 고급 기능)
  */
 export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
   const t = useTranslation();
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [images, setImages] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (shouldClear && textareaRef.current) {
       textareaRef.current.value = '';
+      setImages([]);
       onCleared();
     }
   }, [shouldClear, onCleared]);
 
   const handleKeyDown = (e) => {
     if (e.ctrlKey && e.key === 'Enter') {
-      const content = textareaRef.current.value.trim();
-      if (!content) {
-        alert(t.contentRequired);
-        return;
-      }
-      onSave(content);
+      handleSave();
     }
   };
 
-  const handleSaveClick = () => {
+  const handleSave = () => {
     const content = textareaRef.current.value.trim();
     if (!content) {
       alert(t.contentRequired);
       return;
     }
-    onSave(content);
+    onSave({ content, images });
+  };
+
+  // 이미지 파일 선택 (일괄 처리)
+  const handleImageSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+    
+    // 최대 5개 제한
+    if (images.length + files.length > 5) {
+      alert(t.maxImagesReached || '최대 5개의 이미지만 첨부할 수 있습니다.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const processed = await processBatchImages(files);
+      setImages(prev => [...prev, ...processed]);
+      
+      // 총 크기 계산
+      const totalSize = processed.reduce((sum, img) => sum + parseFloat(img.size), 0);
+      console.log(`✅ 이미지 ${processed.length}개 처리 완료 (총 ${totalSize.toFixed(2)} KB)`);
+    } catch (error) {
+      console.error('Batch processing error:', error);
+      alert(t.imageProcessError || '이미지 처리 중 오류가 발생했습니다.');
+    } finally {
+      setIsProcessing(false);
+    }
+    
+    e.target.value = '';
+  };
+
+  // 이미지 제거
+  const handleRemoveImage = (id) => {
+    setImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  // 드래그 앤 드롭
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type.startsWith('image/')
+    );
+
+    if (files.length > 0) {
+      const dataTransfer = new DataTransfer();
+      files.forEach(file => dataTransfer.items.add(file));
+      
+      const fakeEvent = { target: { files: dataTransfer.files, value: '' } };
+      await handleImageSelect(fakeEvent);
+    }
   };
 
   return (
-    <div className="input-section">
+    <div 
+      className="input-section"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <textarea
         ref={textareaRef}
         placeholder={t.inputPlaceholder}
         onKeyDown={handleKeyDown}
         defaultValue={pendingContent}
       />
-      <button onClick={handleSaveClick}>{t.saveButton}</button>
+      
+      {/* 이미지 미리보기 */}
+      {images.length > 0 && (
+        <div className="image-preview-container">
+          {images.map(img => (
+            <div key={img.id} className="image-preview">
+              <img src={img.thumbnail || img.data} alt={img.name} />
+              <button 
+                className="btn-remove-image" 
+                onClick={() => handleRemoveImage(img.id)}
+                title={t.removeImage || '이미지 제거'}
+              >
+                ✕
+              </button>
+              <div className="image-info">
+                <small>{img.size} KB</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* 처리 중 표시 */}
+      {isProcessing && (
+        <div className="processing-overlay">
+          <p>🖼️ 이미지 처리 중...</p>
+        </div>
+      )}
+      
+      <div className="input-actions">
+        <button className="btn-save" onClick={handleSave} disabled={isProcessing}>
+          {t.saveButton}
+        </button>
+        <button 
+          className="btn-add-image" 
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isProcessing || images.length >= 5}
+          title={t.addImage || '이미지 추가'}
+        >
+          📷 {images.length}/5
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageSelect}
+          style={{ display: 'none' }}
+        />
+      </div>
+      
+      {/* 드래그 앤 드롭 안내 */}
+      <p className="drag-drop-hint">
+        💡 {t.dragDropHint || '이미지를 드래그해서 추가할 수 있습니다'}
+      </p>
     </div>
   );
 }

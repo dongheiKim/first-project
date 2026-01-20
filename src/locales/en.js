@@ -47,4 +47,11 @@ export const en = {
   totalEntries: 'Total Entries',
   thisMonth: 'This Month',
   avgLength: 'Avg Length',
+  addImage: 'Image',
+  removeImage: 'Remove image',
+  invalidImageType: 'Unsupported image format. (jpg, png, gif, webp only)',
+  imageTooLarge: 'Image size must be under 10MB.',
+  imageProcessError: 'Error processing image.',
+  maxImagesReached: 'Maximum 5 images allowed.',
+  dragDropHint: 'Drag and drop images to add',
 };

@@ -14,14 +14,14 @@ export function WritePage() {
   const t = useTranslation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [pendingContent, setPendingContent] = useState('');
+  const [pendingData, setPendingData] = useState({ content: '', images: [] });
   const [shouldClearInput, setShouldClearInput] = useState(false);
 
   /**
    * 저장 요청 (모달 열기)
    */
-  const handleSaveRequest = (content) => {
-    setPendingContent(content);
+  const handleSaveRequest = (data) => {
+    setPendingData(data);
     setIsModalOpen(true);
   };
 
@@ -37,12 +37,13 @@ export function WritePage() {
     const newEntry = {
       id: Date.now(),
       date: formatDateWithDeviceTimezone(now, locale),
-      content: pendingContent
+      content: pendingData.content,
+      images: pendingData.images || []
     };
 
     save(newEntry);
     setIsModalOpen(false);
-    setPendingContent('');
+    setPendingData({ content: '', images: [] });
     setShouldClearInput(true);
     
     // 저장 후 홈으로 이동
@@ -55,7 +56,7 @@ export function WritePage() {
         onSave={handleSaveRequest} 
         shouldClear={shouldClearInput}
         onCleared={() => setShouldClearInput(false)}
-        pendingContent={pendingContent}
+        pendingContent={pendingData.content}
       />
       
       <ConfirmModal

@@ -104,3 +104,16 @@ html.dark-mode .settings-page h2,
 html.dark-mode .settings-section h3 {
   color: var(--text-dark);
 }
+
+/* 다크모드 이미지 */
+html.dark-mode .image-preview {
+  border-color: #475569;
+}
+
+html.dark-mode .entry-image {
+  border-color: #475569;
+}
+
+html.dark-mode .image-preview-container {
+  background: #1e293b;
+}
