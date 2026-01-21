@@ -1,12 +1,3 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
 # Dependencies
 node_modules/
 package-lock.json
@@ -16,26 +7,15 @@ pnpm-lock.yaml
 # Build outputs
 dist/
 dist-ssr/
-build/
-out/
-.next/
 
 # Vite
 .vite/
 *.local
 
-# PWA
-dev-dist/
-public/sw.js
-public/workbox-*.js
-public/manifest-*.json
-
 # Environment variables
 .env
 .env.local
 .env.*.local
-.env.production
-.env.development
 
 # Logs
 logs/
@@ -46,34 +26,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Editor
-.vscode/*
-!.vscode/extensions.json
+# Editor & IDE
+.vscode/settings.json
+.vscode/extensions.json
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.iml
 .project
 .classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-.atom/
 .history/
 
 # OS files
-Thumbs.db
 .DS_Store
 .AppleDouble
 .LSOverride
 ._*
+Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
@@ -87,86 +57,30 @@ temp/
 
 # Cache
 .cache/
-.parcel-cache/
 .eslintcache
 .stylelintcache
 .npm/
 .yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
 
 # Testing
 coverage/
 .nyc_output/
 *.lcov
 __snapshots__/
-*.snap
-cypress/videos/
-cypress/screenshots/
-.storybook-out/
-storybook-static/
 
-# Runtime
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Documentation
-docs/dist/
-.docusaurus/
-
-# Database (혹시 추가할 경우)
-*.db
-*.sqlite
-*.sqlite3
-data/
-
-# API Keys and Secrets (절대 추가!)
+# Secrets & Credentials
 secrets/
 credentials/
 *.key
 *.pem
-*.p12
-.google-cloud-keyfile.json
 google-credentials.json
 firebase-credentials.json
-aws-credentials.json
 
-# Performance and Analysis
-dist-stats.json
-bundle-report.html
-*.performance.json
-lighthouse-report-*.json
-lighthouse-report-*.html
-.tree-shake-analysis/
-bundle-analyzer-report.html
-
-# Backup files
-*.old
-*.orig
-*_backup
-*_old
-
-# Service Worker
-sw.js
-workbox-*.js
-
-# React DevTools
-.react-devtools/
-
-# Source maps (프로덕션 제외)
-*.map
-
-# TypeScript (추후 전환 시)
-*.tsbuildinfo
-.tsbuildinfo
-
-# 기타 불필요한 파일
+# Deployment
 .vercel/
 .netlify/
-.firebase/
-.turbo/
-*.tgz
-.husky/_/
+
+# IDE & Tools
+.vscode/*
+!.vscode/extensions.json
+.idea/
