@@ -11,12 +11,19 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(entry.content);
   const [isSwiping, setIsSwiping] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // 에러 메시지 표시
+  const showError = (msg) => {
+    setErrorMsg(msg);
+    setTimeout(() => setErrorMsg("") , 5000);
+  };
 
   // 수정 내용 저장
   const handleSave = useCallback(() => {
     const trimmed = editContent.trim();
     if (!trimmed) {
-      alert(t.contentRequired);
+      showError(t.contentRequired);
       return;
     }
     triggerHaptic('success');
@@ -64,9 +71,16 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
     <div 
       className={`entry ${isSwiping ? `swiping-${isSwiping}` : ''}`}
       {...swipeHandlers}
+      role="article"
+      aria-label={`Diary entry from ${entry.date}`}
+      tabIndex={0}
     >
       <small className="entry-date">{entry.date}</small>
-      
+      {errorMsg && (
+        <div className="error-message" role="alert" aria-live="assertive" tabIndex={0} style={{color: 'red'}}>
+          {errorMsg}
+        </div>
+      )}
       {isEditing ? (
         <>
           <textarea
@@ -74,12 +88,14 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             autoFocus
+            aria-label="Edit diary entry"
+            tabIndex={0}
           />
           <div className="button-group">
-            <button className="btn-save" onClick={handleSave}>
+            <button className="btn-save" onClick={handleSave} aria-label="Save changes" tabIndex={0}>
               {t.confirmButton}
             </button>
-            <button className="btn-cancel" onClick={handleCancel}>
+            <button className="btn-cancel" onClick={handleCancel} aria-label="Cancel editing" tabIndex={0}>
               {t.cancelButton}
             </button>
           </div>
@@ -87,11 +103,18 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
       ) : (
         <>
           <div className="entry-content">{entry.content}</div>
+          {entry.images && entry.images.length > 0 && (
+            <div className="entry-images">
+              {entry.images.map((img, idx) => (
+                <img src={img} alt={`Diary image ${idx + 1} for ${entry.date}`} key={idx} tabIndex={0} />
+              ))}
+            </div>
+          )}
           <div className="button-group">
-            <button className="btn-edit" onClick={handleEdit}>
+            <button className="btn-edit" onClick={handleEdit} aria-label={`Edit entry from ${entry.date}`} tabIndex={0}>
               {t.editButton}
             </button>
-            <button className="btn-delete" onClick={handleDelete}>
+            <button className="btn-delete" onClick={handleDelete} aria-label={`Delete entry from ${entry.date}`} tabIndex={0}>
               {t.deleteButton}
             </button>
           </div>

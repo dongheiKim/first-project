@@ -25,61 +25,43 @@ function saveTheme(isDark) {
 }
 
 /**
- * 앱 전역 상태 제공자 (메모리 누수 방지)
+ * 앱 전역 상태 제공자
  */
 export function AppProvider({ children }) {
   const [language, setLanguageState] = useState(getCurrentLanguage());
   const [isDarkMode, setIsDarkMode] = useState(getTheme());
   const [entries, setEntries] = useLocalStorage('my_diary_v1', []);
 
-  // 초기 테마 적용
+  // 초기 테마 적용 및 변경 감지
   useEffect(() => {
     saveTheme(isDarkMode);
+    window.dispatchEvent(new Event('themechange'));
   }, [isDarkMode]);
 
-  // 시스템 테마 변경 감지 (다크모드 설정 변경)
+  // 언어 변경 시 글로벌 이벤트
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleThemeChange = (e) => {
-      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-        console.log('System theme changed:', e.matches ? 'dark' : 'light');
-      }
-      // 시스템 테마 변경 감지 (localStorage에 저장된 값이 없을 때만)
-      if (!localStorage.getItem('app_theme')) {
-        setIsDarkMode(e.matches);
-      }
-    };
+    window.dispatchEvent(new Event('languagechange'));
+  }, [language]);
 
-    // 최신 브라우저에서는 addEventListener 사용
-    mediaQuery.addEventListener('change', handleThemeChange);
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleThemeChange);
-    };
-  }, []);
-
-  // 언어 변경 이벤트 감지 (다른 탭에서 변경 시 동기화)
+  // 스토리지 변경 시 cross-tab 동기화
   useEffect(() => {
-    const handleLanguageChange = () => {
-      const newLang = getCurrentLanguage();
-      setLanguageState(newLang);
-      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-        console.log('Language changed to:', newLang);
+    const onStorage = (e) => {
+      if (e.key === 'app_theme') {
+        setIsDarkMode(getTheme());
+      }
+      if (e.key === 'my_diary_v1') {
+        try {
+          setEntries(JSON.parse(e.newValue));
+        } catch {}
       }
     };
-
-    window.addEventListener('languagechange', handleLanguageChange);
-
-    return () => {
-      window.removeEventListener('languagechange', handleLanguageChange);
-    };
-  }, []);
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [setEntries]);
 
   const setLanguage = useCallback((lang) => {
     saveLanguage(lang);
     setLanguageState(lang);
-    // 리렌더링 강제 (번역 변경 반영)
     window.dispatchEvent(new Event('languagechange'));
   }, []);
 
@@ -87,6 +69,7 @@ export function AppProvider({ children }) {
     const newMode = !isDarkMode;
     saveTheme(newMode);
     setIsDarkMode(newMode);
+    window.dispatchEvent(new Event('themechange'));
   }, [isDarkMode]);
 
   const save = useCallback((newEntry) => {
