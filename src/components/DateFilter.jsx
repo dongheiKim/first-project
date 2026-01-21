@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useTranslation, getCurrentLanguage } from '../locales';
 import { formatDateWithDeviceTimezone, getLocaleFromLanguage, safeParseDateString } from '../utils/dateFormatter';
-import '../style.css';
 
 /**
  * 날짜 필터 컴포넌트
  * 일기를 날짜별로 필터링 (전체/오늘/특정 날짜)
  * @param {Function} onFilterChange - 필터 변경 시 호출되는 콜백
  */
-export function DateFilter({ onFilterChange }) {
+const DateFilterComponent = ({ onFilterChange }) => {
   const t = useTranslation();
   const [filterType, setFilterType] = useState('all');
   const [selectedDate, setSelectedDate] = useState('');
@@ -24,7 +23,7 @@ export function DateFilter({ onFilterChange }) {
   }, []);
 
   // 필터 타입 변경 핸들러
-  const handleFilterChange = (type) => {
+  const handleFilterChange = useCallback((type) => {
     setFilterType(type);
     
     if (type === 'all') {
@@ -44,10 +43,10 @@ export function DateFilter({ onFilterChange }) {
       const datePart = customFormatted.split(',')[0].trim();
       onFilterChange(datePart);
     }
-  };
+  }, [onFilterChange, selectedDate]);
 
   // 날짜 선택 핸들러 (날짜 피커)
-  const handleDateSelect = (e) => {
+  const handleDateSelect = useCallback((e) => {
     const date = e.target.value;
     setSelectedDate(date);
     if (date) {
@@ -59,7 +58,7 @@ export function DateFilter({ onFilterChange }) {
       const datePart = customFormatted.split(',')[0].trim();
       onFilterChange(datePart);
     }
-  };
+  }, [onFilterChange]);
 
   return (
     <div className="filter-section">
@@ -87,4 +86,6 @@ export function DateFilter({ onFilterChange }) {
       </div>
     </div>
   );
-}
+};
+
+export const DateFilter = memo(DateFilterComponent);

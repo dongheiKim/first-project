@@ -1,7 +1,0 @@
-/* CSS 모듈 통합 */
-@import './styles/root.css';
-@import './styles/theme.css';
-@import './styles/header.css';
-@import './styles/buttons.css';
-@import './styles/modal.css';
-@import './styles/responsive.css';

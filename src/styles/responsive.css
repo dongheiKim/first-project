@@ -1,3 +1,47 @@
+/* 데스크톱 네비게이션 */
+@media (min-width: 769px) {
+  .navigation {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 12px;
+    background: var(--bg-light);
+    border-radius: 12px;
+  }
+
+  .navigation .nav-link {
+    flex: 1;
+    padding: 12px 16px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-dark);
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  html.dark-mode .navigation .nav-link {
+    background: #1e293b;
+    color: var(--text-dark);
+  }
+
+  .navigation .nav-link:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .navigation .nav-link.active {
+    background: var(--primary);
+    color: white;
+  }
+
+  .nav-label {
+    display: inline;
+  }
+}
+
 /* 모바일 최적화 */
 @media (max-width: 600px) {
   .container {
@@ -48,17 +92,6 @@
   }
 
   .btn-edit, .btn-delete, .btn-save, .btn-cancel {
-    padding: 10px 8px;
-    font-size: 0.85rem;
-  }
-
-  /* 네비게이션 모바일 최적화 */
-  .navigation {
-    padding: 6px;
-    gap: 4px;
-  }
-
-  .nav-link {
     padding: 10px 8px;
     font-size: 0.85rem;
   }

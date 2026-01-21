@@ -34,7 +34,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 입력 필드 */
+/* 기본 폼 요소 */
 textarea {
   padding: 16px;
   border: 2px solid var(--border);
@@ -73,7 +73,7 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* 입력 섹션 */
+/* 레이아웃 */
 .input-section {
   display: flex;
   flex-direction: column;
@@ -81,7 +81,6 @@ textarea:focus {
   margin-bottom: 24px;
 }
 
-/* 필터 섹션 */
 .filter-section {
   margin-bottom: 24px;
 }
@@ -92,62 +91,7 @@ textarea:focus {
   flex-wrap: wrap;
 }
 
-/* 일기 목록 */
-#diary-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.entry {
-  padding: 16px;
-  background: var(--bg-light);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.entry:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
-}
-
-.entry small {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin-bottom: 8px;
-}
-
-.entry > div:not(small):not(.button-group) {
-  margin: 12px 0;
-  line-height: 1.6;
-  color: var(--text-dark);
-}
-
-.edit-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid var(--primary);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1rem;
-  min-height: 100px;
-  margin-bottom: 12px;
-  background: white;
-  color: var(--text-dark);
-  transition: all 0.2s ease;
-}
-
-/* 빈 상태 */
-.empty-message {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-light);
-  font-size: 1.1rem;
-}
-
-/* 뱃지 */
+/* 유틸리티 */
 .today-badge {
   display: inline-block;
   margin-left: 6px;
@@ -180,3 +124,4 @@ textarea:focus {
     opacity: 1;
   }
 }
+

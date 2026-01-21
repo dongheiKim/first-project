@@ -91,7 +91,9 @@ export async function processBatchImages(files) {
       
       await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
-      console.error(`이미지 처리 실패 (${file.name}):`, error);
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.error(`이미지 처리 실패 (${file.name}):`, error);
+      }
     }
   }
   

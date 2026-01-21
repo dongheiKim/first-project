@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from '../locales';
 import { processBatchImages, getBase64Size } from '../utils/imageUtils';
-import '../style.css';
 
 /**
  * 일기 입력 폼 컴포넌트 (이미지 첨부 고급 기능)
@@ -21,23 +20,23 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     }
   }, [shouldClear, onCleared]);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     if (e.ctrlKey && e.key === 'Enter') {
       handleSave();
     }
-  };
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const content = textareaRef.current.value.trim();
     if (!content) {
       alert(t.contentRequired);
       return;
     }
     onSave({ content, images });
-  };
+  }, [images, onSave, t.contentRequired]);
 
   // 이미지 파일 선택 (일괄 처리)
-  const handleImageSelect = async (e) => {
+  const handleImageSelect = useCallback(async (e) => {
     const files = Array.from(e.target.files);
     
     if (files.length === 0) return;
@@ -53,10 +52,6 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     try {
       const processed = await processBatchImages(files);
       setImages(prev => [...prev, ...processed]);
-      
-      // 총 크기 계산
-      const totalSize = processed.reduce((sum, img) => sum + parseFloat(img.size), 0);
-      console.log(`✅ 이미지 ${processed.length}개 처리 완료 (총 ${totalSize.toFixed(2)} KB)`);
     } catch (error) {
       console.error('Batch processing error:', error);
       alert(t.imageProcessError || '이미지 처리 중 오류가 발생했습니다.');
@@ -65,20 +60,20 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     }
     
     e.target.value = '';
-  };
+  }, [images.length, t.maxImagesReached]);
 
   // 이미지 제거
-  const handleRemoveImage = (id) => {
+  const handleRemoveImage = useCallback((id) => {
     setImages(prev => prev.filter(img => img.id !== id));
-  };
+  }, []);
 
   // 드래그 앤 드롭
-  const handleDragOver = (e) => {
+  const handleDragOver = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-  };
+  }, []);
 
-  const handleDrop = async (e) => {
+  const handleDrop = useCallback(async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -93,7 +88,7 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
       const fakeEvent = { target: { files: dataTransfer.files, value: '' } };
       await handleImageSelect(fakeEvent);
     }
-  };
+  }, [handleImageSelect]);
 
   return (
     <div 

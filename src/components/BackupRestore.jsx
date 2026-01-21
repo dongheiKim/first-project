@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useTranslation } from '../translations';
+import { useTranslation } from '../locales';
 import {
   initializeGoogleAPI,
   initializeGIS,
@@ -10,7 +10,6 @@ import {
   isSignedIn,
 } from '../utils/googleDrive';
 import { compressData, decompressData } from '../utils/compression';
-import '../style.css';
 
 /**
  * 백업 & 복원 컴포넌트

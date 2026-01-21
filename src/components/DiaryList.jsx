@@ -1,6 +1,6 @@
+import { memo } from 'react';
 import { DiaryEntry } from './DiaryEntry';
 import { useTranslation } from '../locales';
-import '../style.css';
 
 /**
  * 일기 목록 컴포넌트
@@ -8,7 +8,7 @@ import '../style.css';
  * @param {Function} onUpdate - 일기 수정 시 호출되는 콜백
  * @param {Function} onDelete - 일기 삭제 시 호출되는 콜백
  */
-export function DiaryList({ entries, onUpdate, onDelete }) {
+const DiaryListComponent = ({ entries, onUpdate, onDelete }) => {
   const t = useTranslation();
 
   return (
@@ -27,4 +27,6 @@ export function DiaryList({ entries, onUpdate, onDelete }) {
       )}
     </div>
   );
-}
+};
+
+export const DiaryList = memo(DiaryListComponent);

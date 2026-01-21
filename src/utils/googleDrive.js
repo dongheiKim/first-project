@@ -16,7 +16,9 @@ let gisInited = false;
  */
 export async function initializeGoogleAPI() {
   if (!CLIENT_ID) {
-    console.warn('VITE_GOOGLE_CLIENT_ID가 설정되지 않았습니다.');
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn('VITE_GOOGLE_CLIENT_ID가 설정되지 않았습니다.');
+    }
     throw new Error('Google Client ID not configured');
   }
 

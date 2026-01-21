@@ -81,7 +81,9 @@ export function safeParseDateString(dateStr) {
     
     return null;
   } catch (error) {
-    console.error('Date parsing error:', error);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.error('Date parsing error:', error);
+    }
     return null;
   }
 }

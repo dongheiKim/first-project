@@ -1,5 +1,5 @@
+import { memo } from 'react';
 import { useTranslation } from '../locales';
-import '../style.css';
 
 /**
  * 확인 모달 컴포넌트
@@ -8,7 +8,7 @@ import '../style.css';
  * @param {Function} onConfirm - 확인 버튼 클릭 시 호출
  * @param {Function} onCancel - 취소 버튼 클릭 시 호출
  */
-export function ConfirmModal({ isOpen, message, onConfirm, onCancel }) {
+const ConfirmModalComponent = ({ isOpen, message, onConfirm, onCancel }) => {
   const t = useTranslation();
 
   if (!isOpen) return null;
@@ -29,4 +29,6 @@ export function ConfirmModal({ isOpen, message, onConfirm, onCancel }) {
       </div>
     </div>
   );
-}
+};
+
+export const ConfirmModal = memo(ConfirmModalComponent);

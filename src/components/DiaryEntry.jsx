@@ -1,6 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import { useTranslation } from '../locales';
-import '../style.css';
+import { useSwipe } from '../hooks/useSwipe';
+import { triggerHaptic } from '../utils/mobileUtils';
 
 /**
  * 개별 일기 항목 컴포넌트
@@ -9,6 +10,7 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
   const t = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(entry.content);
+  const [isSwiping, setIsSwiping] = useState(null);
 
   // 수정 내용 저장
   const handleSave = useCallback(() => {
@@ -17,6 +19,7 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
       alert(t.contentRequired);
       return;
     }
+    triggerHaptic('success');
     onUpdate(entry.id, { content: trimmed });
     setIsEditing(false);
   }, [editContent, entry.id, onUpdate, t.contentRequired]);
@@ -30,6 +33,7 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
   // 일기 삭제 (확인 후 실행)
   const handleDelete = useCallback(() => {
     if (window.confirm(t.deleteConfirm)) {
+      triggerHaptic('heavy');
       onDelete(entry.id);
     }
   }, [entry.id, onDelete, t.deleteConfirm]);
@@ -39,8 +43,28 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
     setIsEditing(true);
   }, []);
 
+  // 스와이프 제스처 (모바일 삭제)
+  const swipeHandlers = useSwipe(
+    () => {
+      triggerHaptic('medium');
+      setIsSwiping('left');
+      setTimeout(() => {
+        if (window.confirm(t.deleteConfirm)) {
+          triggerHaptic('heavy');
+          onDelete(entry.id);
+        }
+        setIsSwiping(null);
+      }, 200);
+    },
+    null,
+    100
+  );
+
   return (
-    <div className="entry">
+    <div 
+      className={`entry ${isSwiping ? `swiping-${isSwiping}` : ''}`}
+      {...swipeHandlers}
+    >
       <small className="entry-date">{entry.date}</small>
       
       {isEditing ? (

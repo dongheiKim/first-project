@@ -2,11 +2,13 @@
  * 성능 모니터링 유틸리티
  */
 
+const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+
 /**
  * 페이지 로드 시간 측정
  */
 export function measurePageLoad() {
-  if (window.performance && window.performance.timing) {
+  if (isDev && window.performance && window.performance.timing) {
     const timing = window.performance.timing;
     const loadTime = timing.loadEventEnd - timing.navigationStart;
     console.log(`⏱️ 페이지 로드 시간: ${loadTime}ms`);
@@ -21,7 +23,7 @@ export function measurePageLoad() {
  * 메모리 사용량 측정 (Chrome 전용)
  */
 export function checkMemoryUsage() {
-  if (performance.memory) {
+  if (isDev && performance.memory) {
     const used = Math.round(performance.memory.usedJSHeapSize / 1048576);
     const limit = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
     console.log(`💾 메모리: ${used}MB / ${limit}MB`);
@@ -41,7 +43,7 @@ export function markPerformance(label) {
  * 성능 측정 완료
  */
 export function measurePerformance(label, startMark, endMark) {
-  if (performance.measure) {
+  if (isDev && performance.measure) {
     performance.measure(label, startMark, endMark);
     const measure = performance.getEntriesByName(label)[0];
     console.log(`⏱️ ${label}: ${Math.round(measure.duration)}ms`);

@@ -4,7 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Navigation } from './components/Navigation';
 import { useTranslation } from './locales';
 import { ROUTES } from './utils/constants';
-import './style.css';
+import './styles/main.css';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const WritePage = lazy(() => import('./pages/WritePage'));

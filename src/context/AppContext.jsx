@@ -40,6 +40,8 @@ export function AppProvider({ children }) {
   const setLanguage = useCallback((lang) => {
     saveLanguage(lang);
     setLanguageState(lang);
+    // 리렌더링 강제 (번역 변경 반영)
+    window.dispatchEvent(new Event('languagechange'));
   }, []);
 
   const toggleDarkMode = useCallback(() => {

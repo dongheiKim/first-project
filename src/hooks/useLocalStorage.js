@@ -21,7 +21,9 @@ export function useLocalStorage(key, initialValue) {
       
       return parsed;
     } catch (error) {
-      console.warn(`localStorage 읽기 오류 (${key}):`, error);
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn(`localStorage 읽기 오류 (${key}):`, error);
+      }
       return initialValue;
     }
   });
@@ -39,7 +41,9 @@ export function useLocalStorage(key, initialValue) {
         window.localStorage.setItem(key, JSON.stringify(compressed));
       }
     } catch (error) {
-      console.warn(`localStorage 쓰기 오류 (${key}):`, error);
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn(`localStorage 쓰기 오류 (${key}):`, error);
+      }
     }
   }, [key, storedValue]);
 

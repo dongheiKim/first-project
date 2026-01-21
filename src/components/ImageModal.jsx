@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import '../style.css';
 
 /**
  * 이미지 확대 모달

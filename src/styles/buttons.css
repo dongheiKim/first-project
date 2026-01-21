@@ -25,37 +25,6 @@ button {
   transform: translateY(0);
 }
 
-/* 언어 선택 버튼 */
-.language-selector {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.lang-btn {
-  padding: 8px 12px;
-  border: 2px solid var(--border);
-  background: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.lang-btn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.lang-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
 /* 필터 버튼 */
 .filter-buttons button {
   flex: 1;
