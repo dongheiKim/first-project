@@ -54,4 +54,6 @@ export const ko = {
   imageProcessError: '이미지 처리 중 오류가 발생했습니다.',
   maxImagesReached: '최대 5개의 이미지만 첨부할 수 있습니다.',
   dragDropHint: '이미지를 드래그해서 추가할 수 있습니다',
+  storageStats: '저장소 통계',
+  storageSize: '저장 크기',
 };

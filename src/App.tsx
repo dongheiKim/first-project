@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, type FC } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navigation } from './components/Navigation';
@@ -11,13 +11,13 @@ const WritePage = lazy(() => import('./pages/WritePage'));
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
-const LoadingFallback = () => (
+const LoadingFallback: FC = () => (
   <div className="loading-container">
     <p>⏳ 로딩 중...</p>
   </div>
 );
 
-const AppContent = () => {
+const AppContent: FC = () => {
   const { isDarkMode, toggleDarkMode } = useApp();
   const t = useTranslation();
 
@@ -51,7 +51,7 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
+const App: FC = () => (
   <AppProvider>
     <BrowserRouter>
       <AppContent />

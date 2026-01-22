@@ -76,8 +76,8 @@ export default defineConfig({
         // 청크 분할 전략
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'utils': ['./src/utils/googleDrive.js', './src/utils/compression.js', './src/utils/dateFormatter.js'],
-          'locales': ['./src/locales/index.js'],
+          'utils': ['./src/utils/googleDrive.ts', './src/utils/compression.ts', './src/utils/dateFormatter.ts'],
+          'locales': ['./src/locales/index.ts'],
         },
       },
     },

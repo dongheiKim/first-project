@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, Dispatch, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useState, useCallback, Dispatch, ReactNode } from 'react';
 
 export type DiaryEntry = {
   id: number;
@@ -8,16 +8,20 @@ export type DiaryEntry = {
 
 export type AppState = {
   entries: DiaryEntry[];
-  // ...다른 상태 타입 추가...
 };
 
 export type AppAction =
   | { type: 'ADD_ENTRY'; entry: DiaryEntry }
-  | { type: 'REMOVE_ENTRY'; id: number }
-  // ...다른 액션 타입 추가...
-;
+  | { type: 'REMOVE_ENTRY'; id: number };
 
-const AppContext = createContext<{ state: AppState; dispatch: Dispatch<AppAction> } | undefined>(undefined);
+interface AppContextValue {
+  state: AppState;
+  dispatch: Dispatch<AppAction>;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
@@ -32,11 +36,33 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, { entries: [] });
-  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((prev: boolean) => {
+      const newValue = !prev;
+      localStorage.setItem('darkMode', JSON.stringify(newValue));
+      document.documentElement.classList.toggle('dark', newValue);
+      return newValue;
+    });
+  }, []);
+
+  return (
+    <AppContext.Provider value={{ state, dispatch, isDarkMode, toggleDarkMode }}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppContext must be used within AppProvider');
   return context;
+}
+
+export function useApp() {
+  return useAppContext();
 }

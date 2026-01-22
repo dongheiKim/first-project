@@ -1,10 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, type FC } from 'react';
 import { useTranslation } from '../locales';
+import type { DiaryEntryData } from './DiaryEntry';
+
+interface StorageStatsProps {
+  entries: DiaryEntryData[];
+}
 
 /**
  * 저장소 통계 컴포넌트
  */
-export function StorageStats({ entries }) {
+export const StorageStats: FC<StorageStatsProps> = ({ entries }) => {
   const t = useTranslation();
 
   const stats = useMemo(() => {
@@ -32,4 +37,4 @@ export function StorageStats({ entries }) {
       </div>
     </div>
   );
-}
+};

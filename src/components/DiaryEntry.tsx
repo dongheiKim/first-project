@@ -1,22 +1,35 @@
-import React, { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, type FC } from 'react';
 import { useTranslation } from '../locales';
 import { useSwipe } from '../hooks/useSwipe';
 import { triggerHaptic } from '../utils/mobileUtils';
 
+export interface DiaryEntryData {
+  id: string;
+  content: string;
+  date: string;
+  images?: string[];
+}
+
+interface DiaryEntryProps {
+  entry: DiaryEntryData;
+  onUpdate: (id: string, data: Partial<DiaryEntryData>) => void;
+  onDelete: (id: string) => void;
+}
+
 /**
  * 개별 일기 항목 컴포넌트
  */
-const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
+const DiaryEntryComponent: FC<DiaryEntryProps> = ({ entry, onUpdate, onDelete }) => {
   const t = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(entry.content);
-  const [isSwiping, setIsSwiping] = useState(null);
+  const [isSwiping, setIsSwiping] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   // 에러 메시지 표시
-  const showError = (msg) => {
+  const showError = (msg: string) => {
     setErrorMsg(msg);
-    setTimeout(() => setErrorMsg("") , 5000);
+    setTimeout(() => setErrorMsg(""), 5000);
   };
 
   // 수정 내용 저장
@@ -125,7 +138,7 @@ const DiaryEntryComponent = ({ entry, onUpdate, onDelete }) => {
 };
 
 // props 비교 함수로 정확한 메모이제이션
-const areEqual = (prevProps, nextProps) => {
+const areEqual = (prevProps: DiaryEntryProps, nextProps: DiaryEntryProps): boolean => {
   return (
     prevProps.entry.id === nextProps.entry.id &&
     prevProps.entry.content === nextProps.entry.content &&

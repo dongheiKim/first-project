@@ -1,14 +1,17 @@
-import { memo } from 'react';
+import { memo, type FC } from 'react';
 import { useTranslation } from '../locales';
+
+interface ConfirmModalProps {
+  isOpen: boolean;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
 
 /**
  * 확인 모달 컴포넌트
- * @param {boolean} isOpen - 모달 표시 여부
- * @param {string} message - 표시할 메시지
- * @param {Function} onConfirm - 확인 버튼 클릭 시 호출
- * @param {Function} onCancel - 취소 버튼 클릭 시 호출
  */
-const ConfirmModalComponent = ({ isOpen, message, onConfirm, onCancel }) => {
+const ConfirmModalComponent: FC<ConfirmModalProps> = ({ isOpen, message, onConfirm, onCancel }) => {
   const t = useTranslation();
 
   if (!isOpen) return null;

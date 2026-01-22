@@ -88,3 +88,44 @@ export function fileToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+export interface ProcessedImage {
+  id: string;
+  name: string;
+  data: string;
+  thumbnail?: string;
+  size: number;
+}
+
+/**
+ * Base64 데이터 크기 계산 (KB)
+ */
+export function getBase64Size(base64: string): number {
+  const padding = (base64.match(/=/g) || []).length;
+  const base64Length = base64.length;
+  return Math.round((base64Length * 0.75 - padding) / 1024);
+}
+
+/**
+ * 이미지 일괄 처리
+ */
+export async function processBatchImages(files: File[]): Promise<ProcessedImage[]> {
+  const MAX_WIDTH = 1200;
+  const MAX_HEIGHT = 1200;
+  const QUALITY = 0.8;
+
+  const processFile = async (file: File): Promise<ProcessedImage> => {
+    const resized = await resizeImage(file, MAX_WIDTH, MAX_HEIGHT, QUALITY);
+    const data = await fileToBase64(resized);
+    const size = getBase64Size(data);
+
+    return {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      data,
+      size,
+    };
+  };
+
+  return Promise.all(files.map(processFile));
+}

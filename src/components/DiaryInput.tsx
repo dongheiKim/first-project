@@ -1,15 +1,30 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, type FC, type DragEvent, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from '../locales';
-import { processBatchImages, getBase64Size } from '../utils/imageUtils';
+import { processBatchImages } from '../utils/imageUtils';
+
+interface ProcessedImage {
+  id: string;
+  name: string;
+  data: string;
+  thumbnail?: string;
+  size: number;
+}
+
+interface DiaryInputProps {
+  onSave: (data: { content: string; images: ProcessedImage[] }) => void;
+  shouldClear: boolean;
+  onCleared: () => void;
+  pendingContent?: string;
+}
 
 /**
  * 일기 입력 폼 컴포넌트 (이미지 첨부 고급 기능)
  */
-export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
+export const DiaryInput: FC<DiaryInputProps> = ({ onSave, shouldClear, onCleared, pendingContent }) => {
   const t = useTranslation();
-  const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const [images, setImages] = useState([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [images, setImages] = useState<ProcessedImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -20,14 +35,8 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     }
   }, [shouldClear, onCleared]);
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.ctrlKey && e.key === 'Enter') {
-      handleSave();
-    }
-  }, []);
-
   const handleSave = useCallback(() => {
-    const content = textareaRef.current.value.trim();
+    const content = textareaRef.current?.value.trim() ?? '';
     if (!content) {
       alert(t.contentRequired);
       return;
@@ -35,9 +44,15 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     onSave({ content, images });
   }, [images, onSave, t.contentRequired]);
 
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      handleSave();
+    }
+  }, [handleSave]);
+
   // 이미지 파일 선택 (일괄 처리)
-  const handleImageSelect = useCallback(async (e) => {
-    const files = Array.from(e.target.files);
+  const handleImageSelect = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
     
     if (files.length === 0) return;
     
@@ -60,20 +75,20 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     }
     
     e.target.value = '';
-  }, [images.length, t.maxImagesReached]);
+  }, [images.length, t.maxImagesReached, t.imageProcessError]);
 
   // 이미지 제거
-  const handleRemoveImage = useCallback((id) => {
+  const handleRemoveImage = useCallback((id: string) => {
     setImages(prev => prev.filter(img => img.id !== id));
   }, []);
 
   // 드래그 앤 드롭
-  const handleDragOver = useCallback((e) => {
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback(async (e) => {
+  const handleDrop = useCallback(async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -82,13 +97,25 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
     );
 
     if (files.length > 0) {
-      const dataTransfer = new DataTransfer();
-      files.forEach(file => dataTransfer.items.add(file));
-      
-      const fakeEvent = { target: { files: dataTransfer.files, value: '' } };
-      await handleImageSelect(fakeEvent);
+      // 최대 5개 제한
+      if (images.length + files.length > 5) {
+        alert(t.maxImagesReached || '최대 5개의 이미지만 첨부할 수 있습니다.');
+        return;
+      }
+
+      setIsProcessing(true);
+
+      try {
+        const processed = await processBatchImages(files);
+        setImages(prev => [...prev, ...processed]);
+      } catch (error) {
+        console.error('Batch processing error:', error);
+        alert(t.imageProcessError || '이미지 처리 중 오류가 발생했습니다.');
+      } finally {
+        setIsProcessing(false);
+      }
     }
-  }, [handleImageSelect]);
+  }, [images.length, t.maxImagesReached, t.imageProcessError]);
 
   return (
     <div 
@@ -159,4 +186,4 @@ export function DiaryInput({ onSave, shouldClear, onCleared, pendingContent }) {
       </p>
     </div>
   );
-}
+};

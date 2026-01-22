@@ -13,22 +13,25 @@ import { de } from './de';
 import { ru } from './ru';
 import { pt } from './pt';
 
-const translations = {
+// 번역 타입 정의 (ko 기준)
+export type TranslationKeys = typeof ko;
+
+const translations: Record<string, TranslationKeys> = {
   ko,
-  en,
-  ja,
-  zh,
-  es,
-  fr,
-  de,
-  ru,
-  pt,
+  en: en as TranslationKeys,
+  ja: ja as TranslationKeys,
+  zh: zh as TranslationKeys,
+  es: es as TranslationKeys,
+  fr: fr as TranslationKeys,
+  de: de as TranslationKeys,
+  ru: ru as TranslationKeys,
+  pt: pt as TranslationKeys,
 };
 
 /**
  * 현재 언어 코드 가져오기 (브라우저 설정 또는 localStorage 기반)
  */
-const getLanguage = () => {
+const getLanguage = (): string => {
   const savedLang = localStorage.getItem('app_language');
   if (savedLang && translations[savedLang]) {
     return savedLang;
@@ -40,18 +43,16 @@ const getLanguage = () => {
 
 /**
  * 번역 함수 가져오는 훅
- * @returns {Object} 현재 언어에 맞는 번역 객체
  */
-export function useTranslation() {
+export function useTranslation(): TranslationKeys {
   const language = getLanguage();
   return translations[language];
 }
 
 /**
  * 애플리케이션 언어 설정
- * @param {string} lang - 언어 코드
  */
-export function setLanguage(lang) {
+export function setLanguage(lang: string): void {
   if (translations[lang]) {
     localStorage.setItem('app_language', lang);
     window.dispatchEvent(new Event('languagechange'));
@@ -61,13 +62,13 @@ export function setLanguage(lang) {
 /**
  * 지원되는 모든 언어 코드 가져오기
  */
-export function getSupportedLanguages() {
+export function getSupportedLanguages(): string[] {
   return Object.keys(translations);
 }
 
 /**
  * 현재 선택된 언어 코드 가져오기
  */
-export function getCurrentLanguage() {
+export function getCurrentLanguage(): string {
   return getLanguage();
 }

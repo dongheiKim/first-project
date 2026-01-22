@@ -1,15 +1,20 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, type FC, type ChangeEvent } from 'react';
 import { useTranslation, getCurrentLanguage } from '../locales';
-import { formatDateWithDeviceTimezone, getLocaleFromLanguage, safeParseDateString } from '../utils/dateFormatter';
+import { formatDateWithDeviceTimezone, getLocaleFromLanguage } from '../utils/dateFormatter';
+
+interface DateFilterProps {
+  onFilterChange: (filter: string | null) => void;
+}
+
+type FilterType = 'all' | 'today' | 'custom';
 
 /**
  * 날짜 필터 컴포넌트
  * 일기를 날짜별로 필터링 (전체/오늘/특정 날짜)
- * @param {Function} onFilterChange - 필터 변경 시 호출되는 콜백
  */
-const DateFilterComponent = ({ onFilterChange }) => {
+const DateFilterComponent: FC<DateFilterProps> = ({ onFilterChange }) => {
   const t = useTranslation();
-  const [filterType, setFilterType] = useState('all');
+  const [filterType, setFilterType] = useState<FilterType>('all');
   const [selectedDate, setSelectedDate] = useState('');
   const [todayDate, setTodayDate] = useState('');
 
@@ -23,7 +28,7 @@ const DateFilterComponent = ({ onFilterChange }) => {
   }, []);
 
   // 필터 타입 변경 핸들러
-  const handleFilterChange = useCallback((type) => {
+  const handleFilterChange = useCallback((type: FilterType) => {
     setFilterType(type);
     
     if (type === 'all') {
@@ -46,7 +51,7 @@ const DateFilterComponent = ({ onFilterChange }) => {
   }, [onFilterChange, selectedDate]);
 
   // 날짜 선택 핸들러 (날짜 피커)
-  const handleDateSelect = useCallback((e) => {
+  const handleDateSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const date = e.target.value;
     setSelectedDate(date);
     if (date) {

@@ -1,14 +1,17 @@
-import { memo } from 'react';
-import { DiaryEntry } from './DiaryEntry';
+import { memo, type FC } from 'react';
+import { DiaryEntry, type DiaryEntryData } from './DiaryEntry';
 import { useTranslation } from '../locales';
+
+interface DiaryListProps {
+  entries: DiaryEntryData[];
+  onUpdate: (id: string, data: Partial<DiaryEntryData>) => void;
+  onDelete: (id: string) => void;
+}
 
 /**
  * 일기 목록 컴포넌트
- * @param {Array} entries - 표시할 일기 배열
- * @param {Function} onUpdate - 일기 수정 시 호출되는 콜백
- * @param {Function} onDelete - 일기 삭제 시 호출되는 콜백
  */
-const DiaryListComponent = ({ entries, onUpdate, onDelete }) => {
+const DiaryListComponent: FC<DiaryListProps> = ({ entries, onUpdate, onDelete }) => {
   const t = useTranslation();
 
   return (

@@ -1,11 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, type FC } from 'react';
+
+interface ImageModalProps {
+  imageUrl: string | null;
+  onClose: () => void;
+}
 
 /**
  * 이미지 확대 모달
  */
-export function ImageModal({ imageUrl, onClose }) {
+export const ImageModal: FC<ImageModalProps> = ({ imageUrl, onClose }) => {
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
@@ -27,4 +32,4 @@ export function ImageModal({ imageUrl, onClose }) {
       </div>
     </div>
   );
-}
+};

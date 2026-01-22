@@ -1,11 +1,11 @@
-import { memo } from 'react';
+import { memo, type FC } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../locales';
 
 /**
  * 네비게이션 바 컴포넌트
  */
-const NavigationComponent = () => {
+const NavigationComponent: FC = () => {
   const t = useTranslation();
 
   return (

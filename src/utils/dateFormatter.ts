@@ -59,3 +59,51 @@ export function isValidDateString(date: string): boolean {
   const parsed = new Date(date);
   return !isNaN(parsed.getTime());
 }
+
+/**
+ * 기기 시간대를 사용하여 날짜 포맷팅
+ */
+export function formatDateWithDeviceTimezone(date: Date, locale: string = 'ko-KR'): string {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return date.toLocaleString();
+  }
+}
+
+/**
+ * 언어 코드를 로케일로 변환
+ */
+export function getLocaleFromLanguage(lang: string): string {
+  const localeMap: Record<string, string> = {
+    ko: 'ko-KR',
+    en: 'en-US',
+    ja: 'ja-JP',
+    zh: 'zh-CN',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    de: 'de-DE',
+    ru: 'ru-RU',
+    pt: 'pt-BR',
+  };
+  return localeMap[lang] || 'en-US';
+}
+
+/**
+ * 날짜 문자열을 안전하게 파싱
+ */
+export function safeParseDateString(dateStr: string): Date | null {
+  try {
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+  } catch {
+    return null;
+  }
+}
