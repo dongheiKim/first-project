@@ -22,7 +22,7 @@ export function BackupRestore({ entries, onImport }) {
   const fileInputRef = useRef(null);
   const [isGoogleSignedIn, setIsGoogleSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [message, setMessage] = useState({ type: '', text: '' });
   const [progress, setProgress] = useState(0);
 
   // Google API 초기화
@@ -33,7 +33,7 @@ export function BackupRestore({ entries, onImport }) {
         await initializeGIS();
         setIsGoogleSignedIn(isSignedIn());
       } catch (error) {
-      setTimeout(() => setErrorMsg(""), 5000);
+        showMessage('error', t.syncError);
       }
     };
     init();
@@ -43,23 +43,31 @@ export function BackupRestore({ entries, onImport }) {
   const handleExport = () => {
     (async () => {
       if (entries.length === 0) {
-        alert(t.noDataToExport);
+        showMessage('info', t.noDataToExport);
         return;
       }
-      const compressed = await compressWithWorker(entries);
-      const dataStr = JSON.stringify(compressed);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      const timestamp = new Date().toISOString().slice(0, 10);
-      link.download = `diary-backup-${timestamp}.json`;
-      link.href = url;
-      link.click();
-      URL.revokeObjectURL(url);
-      const originalSize = JSON.stringify(entries).length;
-      const compressedSize = dataStr.length;
-      const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-      alert(`${t.exportSuccess}\n원본: ${(originalSize / 1024).toFixed(1)} KB\n압축: ${(compressedSize / 1024).toFixed(1)} KB\n감소율: ${reduction}%`);
+      setIsLoading(true);
+      try {
+        showMessage('info', t.exportData + '...');
+        const compressed = await compressWithWorker(entries);
+        const dataStr = JSON.stringify(compressed);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().slice(0, 10);
+        link.download = `diary-backup-${timestamp}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        const originalSize = JSON.stringify(entries).length;
+        const compressedSize = dataStr.length;
+        const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+        showMessage('success', `${t.exportSuccess}\n원본: ${(originalSize / 1024).toFixed(1)} KB\n압축: ${(compressedSize / 1024).toFixed(1)} KB\n감소율: ${reduction}%`);
+      } catch (error) {
+        showMessage('error', t.importError);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   };
 
@@ -72,9 +80,11 @@ export function BackupRestore({ entries, onImport }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setIsLoading(true);
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
+        showMessage('info', t.importData + '...');
         const parsedData = JSON.parse(event.target?.result);
         let importedData;
         if (Array.isArray(parsedData) && parsedData.length > 0) {
@@ -96,14 +106,17 @@ export function BackupRestore({ entries, onImport }) {
         }
         if (entries.length > 0) {
           if (!window.confirm(t.confirmImport)) {
+            setIsLoading(false);
             return;
           }
         }
         onImport(importedData);
-        alert(t.importSuccess);
+        showMessage('success', t.importSuccess);
       } catch (error) {
-        showError(t.importError);
+        showMessage('error', t.importError);
         console.error('Import error:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     reader.readAsText(file);
@@ -114,11 +127,13 @@ export function BackupRestore({ entries, onImport }) {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+      showMessage('info', t.signInGoogle + '...');
       await authenticateGoogle();
       setIsGoogleSignedIn(true);
+      showMessage('success', t.syncSuccess);
     } catch (error) {
       console.error('Sign in error:', error);
-      alert(t.syncError);
+      showMessage('error', t.syncError);
     } finally {
       setIsLoading(false);
     }
@@ -133,23 +148,24 @@ export function BackupRestore({ entries, onImport }) {
   // 구글 드라이브에 업로드 (압축 적용)
   const handleUploadToDrive = async () => {
     if (!isGoogleSignedIn) {
-      alert(t.notSignedIn);
+      showMessage('info', t.notSignedIn);
       return;
     }
     if (entries.length === 0) {
-      alert(t.noDataToExport);
+      showMessage('info', t.noDataToExport);
       return;
     }
     try {
       setIsLoading(true);
+      showMessage('info', t.uploadToDrive + '...');
       const compressed = await compressWithWorker(entries);
       const dataStr = JSON.stringify(compressed);
       await uploadToDrive('diary-backup.json', dataStr);
       const reduction = ((1 - dataStr.length / JSON.stringify(entries).length) * 100).toFixed(1);
-      alert(`${t.syncSuccess}\n크기 감소: ${reduction}%`);
+      showMessage('success', `${t.syncSuccess}\n크기 감소: ${reduction}%`);
     } catch (error) {
       console.error('Upload error:', error);
-      alert(t.syncError);
+      showMessage('error', t.syncError);
     } finally {
       setIsLoading(false);
     }
@@ -158,11 +174,12 @@ export function BackupRestore({ entries, onImport }) {
   // 구글 드라이브에서 다운로드 (압축 해제)
   const handleDownloadFromDrive = async () => {
     if (!isGoogleSignedIn) {
-      alert(t.notSignedIn);
+      showMessage('info', t.notSignedIn);
       return;
     }
     try {
       setIsLoading(true);
+      showMessage('info', t.downloadFromDrive + '...');
       const dataStr = await downloadFromDrive('diary-backup.json');
       const parsedData = JSON.parse(dataStr);
       let importedData;
@@ -181,19 +198,19 @@ export function BackupRestore({ entries, onImport }) {
         }
       }
       onImport(importedData);
-      alert(t.syncSuccess);
+      showMessage('success', t.syncSuccess);
     } catch (error) {
       console.error('Download error:', error);
-      alert(t.syncError);
+      showMessage('error', t.syncError);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 에러 메시지 표시
-  const showError = (msg) => {
-    setErrorMsg(msg);
-    setTimeout(() => setErrorMsg("") , 5000);
+  // 메시지 표시 (타입: success, error, info)
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
   return (
@@ -214,10 +231,27 @@ export function BackupRestore({ entries, onImport }) {
           style={{ display: 'none' }}
         />
       </div>
-      {/* 에러 메시지 영역 */}
-      {errorMsg && (
-        <div className="error-message" role="alert" aria-live="assertive" tabIndex={0} style={{color: 'red'}}>
-          {errorMsg}
+      {/* 메시지 영역 (Toast 스타일) */}
+      {message.text && (
+        <div 
+          className={`toast-message toast-${message.type}`}
+          role="alert" 
+          aria-live="assertive" 
+          tabIndex={0}
+          style={{
+            color: message.type === 'error' ? 'red' : message.type === 'success' ? 'green' : '#333',
+            background: '#fff',
+            border: `1px solid ${message.type === 'error' ? 'red' : message.type === 'success' ? 'green' : '#aaa'}`,
+            borderRadius: '6px',
+            padding: '8px 16px',
+            margin: '8px 0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            maxWidth: 400,
+            whiteSpace: 'pre-line',
+            fontWeight: 500
+          }}
+        >
+          {message.text}
         </div>
       )}
       {/* 진행률 바 예시 */}
