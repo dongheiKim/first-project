@@ -1,0 +1,3 @@
+export function lazyLoadImage(_img: HTMLImageElement): void {
+  // ...타입 명시...
+}
