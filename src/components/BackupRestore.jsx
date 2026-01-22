@@ -9,7 +9,7 @@ import {
   signOutGoogle,
   isSignedIn,
 } from '../utils/googleDrive';
-import { compressData, decompressData } from '../utils/compression';
+import { compressWithWorker, decompressWithWorker } from '../utils/backupUtils';
 
 /**
  * 백업 & 복원 컴포넌트
@@ -41,24 +41,26 @@ export function BackupRestore({ entries, onImport }) {
 
   // 데이터 내보내기 (압축 적용)
   const handleExport = () => {
-    if (entries.length === 0) {
-      alert(t.noDataToExport);
-      return;
-    }
-    const compressed = compressData(entries);
-    const dataStr = JSON.stringify(compressed);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    const timestamp = new Date().toISOString().slice(0, 10);
-    link.download = `diary-backup-${timestamp}.json`;
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
-    const originalSize = JSON.stringify(entries).length;
-    const compressedSize = dataStr.length;
-    const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-    alert(`${t.exportSuccess}\n원본: ${(originalSize / 1024).toFixed(1)} KB\n압축: ${(compressedSize / 1024).toFixed(1)} KB\n감소율: ${reduction}%`);
+    (async () => {
+      if (entries.length === 0) {
+        alert(t.noDataToExport);
+        return;
+      }
+      const compressed = await compressWithWorker(entries);
+      const dataStr = JSON.stringify(compressed);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.download = `diary-backup-${timestamp}.json`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      const originalSize = JSON.stringify(entries).length;
+      const compressedSize = dataStr.length;
+      const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+      alert(`${t.exportSuccess}\n원본: ${(originalSize / 1024).toFixed(1)} KB\n압축: ${(compressedSize / 1024).toFixed(1)} KB\n감소율: ${reduction}%`);
+    })();
   };
 
   // 파일 선택 트리거
@@ -71,13 +73,13 @@ export function BackupRestore({ entries, onImport }) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const parsedData = JSON.parse(event.target?.result);
         let importedData;
         if (Array.isArray(parsedData) && parsedData.length > 0) {
           if (parsedData[0].i !== undefined) {
-            importedData = decompressData(parsedData);
+            importedData = await decompressWithWorker(parsedData);
           } else if (parsedData[0].id !== undefined) {
             importedData = parsedData;
           } else {
@@ -140,7 +142,7 @@ export function BackupRestore({ entries, onImport }) {
     }
     try {
       setIsLoading(true);
-      const compressed = compressData(entries);
+      const compressed = await compressWithWorker(entries);
       const dataStr = JSON.stringify(compressed);
       await uploadToDrive('diary-backup.json', dataStr);
       const reduction = ((1 - dataStr.length / JSON.stringify(entries).length) * 100).toFixed(1);
@@ -165,7 +167,7 @@ export function BackupRestore({ entries, onImport }) {
       const parsedData = JSON.parse(dataStr);
       let importedData;
       if (parsedData.length > 0 && parsedData[0].i !== undefined) {
-        importedData = decompressData(parsedData);
+        importedData = await decompressWithWorker(parsedData);
       } else {
         importedData = parsedData;
       }
