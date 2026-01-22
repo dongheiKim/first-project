@@ -93,16 +93,22 @@ export function BackupRestore({ entries, onImport }) {
           } else if (parsedData[0].id !== undefined) {
             importedData = parsedData;
           } else {
-            throw new Error('Invalid format');
+            showMessage('error', t.importError + ' (format)');
+            setIsLoading(false);
+            return;
           }
         } else {
-          throw new Error('Invalid format');
+          showMessage('error', t.importError + ' (empty)');
+          setIsLoading(false);
+          return;
         }
         const isValid = importedData.every(
           (entry) => entry.id && entry.date && entry.content
         );
         if (!isValid) {
-          throw new Error('Invalid entry format');
+          showMessage('error', t.importError + ' (entry)');
+          setIsLoading(false);
+          return;
         }
         if (entries.length > 0) {
           if (!window.confirm(t.confirmImport)) {
@@ -113,8 +119,10 @@ export function BackupRestore({ entries, onImport }) {
         onImport(importedData);
         showMessage('success', t.importSuccess);
       } catch (error) {
-        showMessage('error', t.importError);
-        console.error('Import error:', error);
+        showMessage('error', t.importError + (error?.message ? `: ${error.message}` : ''));
+        if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+          console.error('Import error:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -132,8 +140,10 @@ export function BackupRestore({ entries, onImport }) {
       setIsGoogleSignedIn(true);
       showMessage('success', t.syncSuccess);
     } catch (error) {
-      console.error('Sign in error:', error);
-      showMessage('error', t.syncError);
+      showMessage('error', t.syncError + (error?.message ? `: ${error.message}` : ''));
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.error('Sign in error:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -164,8 +174,10 @@ export function BackupRestore({ entries, onImport }) {
       const reduction = ((1 - dataStr.length / JSON.stringify(entries).length) * 100).toFixed(1);
       showMessage('success', `${t.syncSuccess}\n크기 감소: ${reduction}%`);
     } catch (error) {
-      console.error('Upload error:', error);
-      showMessage('error', t.syncError);
+      showMessage('error', t.syncError + (error?.message ? `: ${error.message}` : ''));
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.error('Upload error:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -189,7 +201,9 @@ export function BackupRestore({ entries, onImport }) {
         importedData = parsedData;
       }
       if (!Array.isArray(importedData)) {
-        throw new Error('Invalid format');
+        showMessage('error', t.importError + ' (format)');
+        setIsLoading(false);
+        return;
       }
       if (entries.length > 0) {
         if (!window.confirm(t.confirmImport)) {
@@ -200,8 +214,10 @@ export function BackupRestore({ entries, onImport }) {
       onImport(importedData);
       showMessage('success', t.syncSuccess);
     } catch (error) {
-      console.error('Download error:', error);
-      showMessage('error', t.syncError);
+      showMessage('error', t.syncError + (error?.message ? `: ${error.message}` : ''));
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.error('Download error:', error);
+      }
     } finally {
       setIsLoading(false);
     }
